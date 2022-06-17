@@ -1,0 +1,194 @@
+<div [formGroup]="hotelBooking">
+    <div class="container mt-5 bannerMargin">
+        <div class="card shadow-lg p-3 mb-5 bg-body rounded">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col col-sm-6 col-md-6 col-lg-4 col-xl-3 btn-group mb-3">
+                        <mat-button-toggle-group class="toggleBtn">
+                            <mat-button-toggle (click)="disableBtn(1)" class="btn"
+                                [ngClass]="{'active': oneTab==='oneWayTab1'}" value="one way">One Way
+                            </mat-button-toggle>
+                            <mat-button-toggle (click)="disableBtn(2)" class="btn"
+                                [ngClass]="{'active': oneTab==='oneWayTab2'}" value="Round Trip">Round Trip
+                            </mat-button-toggle>
+                        </mat-button-toggle-group>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                        <mat-form-field appearance="outline">
+                            <mat-label>From</mat-label>
+                            <input #inputAutoComplete formControlName="fromCity" [matAutocomplete]="auto"
+                                #trigger="matAutocompleteTrigger" matInput type="text" />
+                            <div matSuffix style="display:flex">
+                                <button (click)="clearInputFrom($event)"
+                                    *ngIf=" this.hotelBooking.controls['fromCity']?.value!==null && this.hotelBooking.controls['fromCity']?.value!==''"
+                                    aria-label="Clear" mat-icon-button type="button">
+                                    <mat-icon>clear</mat-icon>
+                                </button>
+                                <button aria-label="Clear" mat-icon-button type="button">
+                                    <mat-icon>{{arrowIconSubject.getValue()}}</mat-icon>
+                                </button>
+                            </div>
+                            <mat-autocomplete #auto="matAutocomplete"
+                                (closed)="arrowIconSubject.next('arrow_drop_down')"
+                                (opened)="arrowIconSubject.next('arrow_drop_up')"
+                                (optionSelected)="arrowIconSubject.next('arrow_drop_down')"
+                                [displayWith]="displayFnFrom">
+                                <mat-option *ngFor="let item of filteredOptions | async " [value]="item">
+                                    {{item.name}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                    <div class="col col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                        <mat-form-field appearance="outline">
+                            <mat-label>To</mat-label>
+                            <input #inputAutoComplete formControlName="toCity" [matAutocomplete]="auto"
+                                #trigger="matAutocompleteTrigger" matInput type="text" />
+                            <div matSuffix style="display:flex">
+                                <button (click)="clearInputTo($event)"
+                                    *ngIf=" this.hotelBooking.controls['toCity']?.value!==null && this.hotelBooking.controls['toCity']?.value!==''"
+                                    aria-label="Clear" mat-icon-button type="button">
+                                    <mat-icon>clear</mat-icon>
+                                </button>
+                                <button aria-label="Clear" mat-icon-button type="button">
+                                    <mat-icon>{{arrowIconSubject.getValue()}}</mat-icon>
+                                </button>
+                            </div>
+                            <mat-autocomplete #auto="matAutocomplete"
+                                (closed)="arrowIconSubject.next('arrow_drop_down')"
+                                (opened)="arrowIconSubject.next('arrow_drop_up')"
+                                (optionSelected)="arrowIconSubject.next('arrow_drop_down')" [displayWith]="displayFnTo">
+                                <mat-option *ngFor="let item of filteredOptions | async " [value]="item">
+                                    {{item.name}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                    <div class="col col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                        <div class="input-group">
+                            <input class="form-control" placeholder="dd-mm-yyyy" readonly (click)="arrivalDate.toggle()"
+                                name="dpFrom" [(ngModel)]="model" [displayMonths]="2" [weekdays]="true"
+                                navigation="navigation" ngbDatepicker #arrivalDate="ngbDatepicker" [minDate]="minDate"
+                                formControlName="dateFrom">
+                            <button class="btn btn-outline-secondary calendar" (click)="arrivalDate.toggle()"
+                                type="button">
+                                <mat-datepicker-toggle matSuffix></mat-datepicker-toggle>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                        <div class="input-group">
+                            <input class="form-control" placeholder="dd-mm-yyyy" readonly (click)="returnDate.toggle()"
+                                name="dpTo" [displayMonths]="2" [weekdays]="true" navigation="navigation" ngbDatepicker
+                                #returnDate="ngbDatepicker" [minDate]="minDate" formControlName="dateTo"
+                                [disabled]='toggleButton'>
+                            <button class="btn btn-outline-secondary calendar" (click)="returnDate.toggle()"
+                                type="button" [disabled]='toggleButton' style="text-align: justify;">
+                                <mat-datepicker-toggle matSuffix></mat-datepicker-toggle>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-3 col-sm-6 col-md-6 col-lg-4 col-xl-2">
+                        <div ngbDropdown class="d-inline-block">
+                            <button type="button" class="btn btn-outline" ngbDropdownToggle>{{ adultsData +
+                                childrensData + infantsData }}&nbsp; Travellers
+                            </button>
+
+                            <div ngbDropdownMenu style="width: max-content;">
+                                <div class="row m-2">
+                                    <div class="col-4">
+                                        <p>Adults (12y +)</p>
+                                    </div>
+                                    <div class="col-8">
+                                        <button mat-button mat-icon-button matPrefix aria-label="Remove"
+                                            (click)="adultIncrementValue(-adults_step)"
+                                            [disabled]="shouldDisableDecrement(adultsData)">
+                                            <mat-icon>remove</mat-icon>
+                                        </button>
+                                        {{adultsData}}
+                                        <button mat-button mat-icon-button matSuffix aria-label="Add" class="m-2"
+                                            (click)="adultIncrementValue(adults_step)"
+                                            [disabled]="shouldDisableIncrement(adultsData)">
+                                            <mat-icon>add</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-4">
+                                        <p>Childrens (2y - 12y)</p>
+                                    </div>
+                                    <div class="col-8">
+                                        <button mat-button mat-icon-button matPrefix aria-label="Remove"
+                                            (click)="childIncrementValue(-child_step)"
+                                            [disabled]="childShouldDisableDecrement(childrensData)">
+                                            <mat-icon>remove</mat-icon>
+                                        </button>
+                                        {{childrensData}}
+                                        <button mat-button mat-icon-button matSuffix aria-label="Add" class="m-2"
+                                            (click)="childIncrementValue(child_step)"
+                                            [disabled]="childShouldDisableIncrement(childrensData)">
+                                            <mat-icon>add</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="row m-2">
+                                    <div class="col-4">
+                                        <p>Infants (Below 2y)</p>
+                                    </div>
+                                    <div class="col-8">
+                                        <button mat-button mat-icon-button matPrefix aria-label="Remove"
+                                            (click)="infantsIncrementValue(-infats_step)"
+                                            [disabled]="infantsShouldDisableDecrement(infantsData)">
+                                            <mat-icon>remove</mat-icon>
+                                        </button>
+                                        {{infantsData}}
+                                        <button mat-button mat-icon-button matSuffix aria-label="Add" class="m-2"
+                                            (click)="infantsIncrementValue(infats_step)"
+                                            [disabled]="infantsShouldDisableIncrement(infantsData)">
+                                            <mat-icon>add</mat-icon>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3 col-sm-6 col-md-6 col-lg-4 col-xl-3">
+                        <div ngbDropdown class="d-inline-block">
+                            <button type="button" class="btn btn-outline" ngbDropdownToggle> Travellers Class
+                            </button>
+                            <div class="ms-3">
+                                {{travelClassShowData}}
+                            </div>
+                            <div ngbDropdownMenu>
+                                <div class="row m-3">
+                                    <div class="col-12">
+                                        <label id="example-radio-group-label">Choose Travel class</label>
+                                        <mat-radio-group>
+                                            <mat-radio-button (click)="travelClass('Economy/ Premium Economy')" name="economy"
+                                                [ngClass]="{'': travelClassData==='travelClassData1'}" class="mt-2" value="Economy/ Premium Economy" [checked]="true">
+                                                Economy/ Premium Economy
+                                            </mat-radio-button>
+                                            <mat-radio-button (click)="travelClass('Premium Economy')" name="premium" 
+                                                [ngClass]="{'': travelClassData==='travelClassData2'}" class="mt-2" value="Premium Economy">
+                                                Premium Economy
+                                            </mat-radio-button>
+                                            <mat-radio-button (click)="travelClass('Business')" name="business "
+                                                [ngClass]="{'': travelClassData==='travelClassData3'}" class="mt-2" value="Business">
+                                                Business
+                                            </mat-radio-button>
+                                        </mat-radio-group>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-6 col-md-6 col-lg-4 col-xl-7 d-flex justify-content-end apply h-100">
+                        <button type="button" class="btn">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
